@@ -46,6 +46,7 @@
                      :placeholder "e.g. org.clojure/clojure"
                      :type :text
                      :validator #(:form-status state)
+                     :text-on-fail "Library not found. Please check out name of library (it is case sensitive)."
                      :on-change #(let [library (.. % -target -value)]
                                    (check-library-exists owner (:timer state) library)
                                    (om/update! data :library library))

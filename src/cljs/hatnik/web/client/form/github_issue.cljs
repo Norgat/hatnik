@@ -47,6 +47,7 @@
                               :id "gh-repo"
                               :title "Repository"
                               :validator #(:repo-status state)
+                              :text-on-fail "Repository isn't exist."
                               :placeholder "user/repo or organization/repo"
                               :type :text
                               :on-change #(let [repo (.. % -target -value)]
