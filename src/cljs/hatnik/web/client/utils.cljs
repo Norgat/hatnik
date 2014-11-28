@@ -25,7 +25,9 @@
 (defn warning-helper [validator data text-on-fail]
   (if (= "" data)
     "Field can't be empty!"
-    text-on-fail))
+    (if text-on-fail
+      text-on-fail
+      "Ouch! Something went wrong.")))
 
 (defn form-field
   "Creates standard form field"

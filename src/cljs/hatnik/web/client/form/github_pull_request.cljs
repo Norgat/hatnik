@@ -4,7 +4,8 @@
             [hatnik.web.client.z-actions :as action]
             [hatnik.web.client.utils :as u]
             [hatnik.schema :as schm])
-  (:use [clojure.string :only [split replace]]))
+  (:use [clojure.string :only [split replace]]
+        [hatnik.web.client.form.github-repo-check :only [github-repo-on-change]]))
 
 (defn pull-request-operation [data owner]
   (reify
@@ -75,16 +76,27 @@
 
 (defn github-pull-request-component [data owner]
   (reify
-    om/IRender
-    (render [this]
+    om/IInitState
+    (init-state [this]
+      {:repo-status
+       (if (empty? (:gh-repo data))
+         "has-warning"
+         "has-success")
+       :timer nil})
+    om/IRenderState
+    (render-state [this state]
       (dom/div nil
                (u/form-field {:data data
                               :field :gh-repo
                               :id "gh-repo"
                               :title "Repository"
-                              :validator schm/GithubRepository
+                              :validator #(:repo-status state)
+                              :text-on-fail "Repository isn't exist."
                               :placeholder "user/repo or organization/repo"
-                              :type :text})
+                              :type :text
+                              :on-change #(let [repo (.. % -target -value)]
+                                            (github-repo-on-change repo (:timer state) owner)
+                                            (om/update! data :gh-repo repo))})
                (u/form-field {:data data
                               :field :title
                               :id "gh-title"

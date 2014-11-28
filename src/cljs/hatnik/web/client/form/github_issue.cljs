@@ -4,31 +4,8 @@
             [hatnik.web.client.z-actions :as action]
             [hatnik.web.client.utils :as u]
             [hatnik.schema :as schm])
-  (:use [clojure.string :only [split replace]]))
-
-(defn set-repo-status [owner status]
-  (om/set-state! owner :repo-status status))
-
-(defn github-repos-handler [reply owner repo]
-  (let [rest (js->clj reply)
-        exists? (some #(= repo (get % "name")) rest)]
-    (set-repo-status owner
-                     (if exists? "has-success" "has-error"))))
-
-(defn github-issue-on-change [gh-repo timer owner]
-  (js/clearTimeout timer)
-  (set-repo-status owner "has-warning")
-  (let [[user repo] (split gh-repo "/")]
-    (when-not (or (nil? repo) (nil? user)
-                  (= "" user) (= "" repo))
-      (let [timer (js/setTimeout
-                   (fn []
-                     (action/get-github-repos
-                      user
-                      #(github-repos-handler % owner repo)
-                      #(set-repo-status owner "has-error")))
-                   1000)]
-        (om/set-state! owner :timer timer)))))
+  (:use [clojure.string :only [split replace]]
+        [hatnik.web.client.form.github-repo-check :only [github-repo-on-change]]))
 
 (defn github-issue-component [data owner]
   (reify
@@ -51,7 +28,7 @@
                               :placeholder "user/repo or organization/repo"
                               :type :text
                               :on-change #(let [repo (.. % -target -value)]
-                                            (github-issue-on-change repo (:timer state) owner)
+                                            (github-repo-on-change repo (:timer state) owner)
                                             (om/update! data :gh-repo repo))})
                (u/form-field {:data data
                               :field :title
