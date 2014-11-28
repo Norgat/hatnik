@@ -154,13 +154,14 @@
     om/IRender 
     (render [this]
       (dom/div nil
-      (dom/div 
-       #js {:className "row"}
-       (dom/div #js {:className "col-md-2"}
-                (dom/a #js {:className "btn btn-success"
-                            :onClick add-new-project} "Add project"))
-       (dom/div #js {:className "col-md-10"}))
-
-      (dom/div nil
-               (dom/p nil "")
-               (om/build project-list data))))))
+               (dom/div nil
+                        (dom/p nil "")
+                        (om/build project-list data))
+               
+               (dom/div 
+                #js {:className "row"}
+                (dom/div #js {:className "col-md-3"})
+                (dom/div #js {:className "col-md-6"}
+                         (dom/div #js {:className "btn btn-primary btn-block"
+                                       :onClick add-new-project} "Add project"))
+                (dom/div #js {:className "col-md-3"}))))))
